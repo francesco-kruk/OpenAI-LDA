@@ -1,30 +1,33 @@
 from bs4 import BeautifulSoup
 import requests
 
-from_page = 1
-to_page = 6
-review={}
-review_list=[]
-
+review = {}
+review_list = []
+count = 0
 
 response = requests.get(f"https://www.producthunt.com/products/openai/reviews")
 web_page = response.text
 
 if response.status_code == 200:
     soup = BeautifulSoup(web_page, "html.parser")
-    review_elements = soup.find_all("div", {"class": "flex direction-column"})
+    target = soup.find("div", {"class": "flex direction-column flex-column-gap-8 mt-6 mb-default"})
+    review_elements = target.findChildren("div", recursive=False)
+    print(review_elements)
 
     for review_element in review_elements:
         review["review_name"] = review_element.find("a", {"class": "color-darker-grey fontSize-16 fontWeight-600"}).text
-        review["review_score"] = review_element.find("div", {"class": "flex direction-row"}).find('img').get('alt')
-        if review_element.find("p", {"class": "styles_htmlText__iftLe"}) == None:
+        # review["review_score"] = review_element.find("div", {"class": "flex direction-row"}).find('img').get('alt')
+        # Score could be implemented by going through the stars and counting how many filled in
+        if review_element.find("div", {"class": "styles_htmlText__iftLe"}) == None:
             review_list.append(review)
             review = {}
             continue
         else:
-            review["review_text"] = review_element.find("p", {"class": "typography_body-l__KUYFJ"}).text
+            review["review_text"] = review_element.find("div", {"class": "styles_htmlText__iftLe"}).text
         review_list.append(review)
         review = {}
+        count = count + 1
+        print(count)
 
 else:
     print("Failed to retrieve the page. Status code:", response.status_code)
