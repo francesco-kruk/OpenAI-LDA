@@ -8,6 +8,10 @@ count = 0
 response = requests.get(f"https://www.producthunt.com/products/openai/reviews")
 web_page = response.text
 
+"""
+To add more elements per page could use Postman/Insomnia as shown in https://www.youtube.com/watch?v=DqtlR0y0suo
+"""
+
 if response.status_code == 200:
     soup = BeautifulSoup(web_page, "html.parser")
     target = soup.find("div", {"class": "flex direction-column flex-column-gap-8 mt-6 mb-default"})
